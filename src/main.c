@@ -22,27 +22,30 @@ int main(int argc, char **args)
 {
     pthread_t stats_thrd;
     uint8_t addrs_len;
-    ipv4_t *addrs;
+    ipv4_t *addrs, self;
     uint32_t total = 0;
     struct telnet_info info;
+
+    if (argc == 2)
+    {
+        //id_tag = args[1];
+        self = inet_addr(args[1]);
+    } else {
+        printf("err: missing ip !!");
+        return -1;
+    }
 
 #ifdef DEBUG
     addrs_len = 1;
     addrs = calloc(4, sizeof (ipv4_t));
     //addrs[0] = inet_addr("0.0.0.0");
-    addrs[0] = inet_addr("192.168.179.164"); // Address to bind to
+    addrs[0] = self; // Address to bind to
 #else
     addrs_len = 2;
     addrs = calloc(addrs_len, sizeof (ipv4_t));
-
-    addrs[0] = inet_addr("192.168.179.164"); // Address to bind to
-    addrs[1] = inet_addr("192.168.179.164"); // Address to bind to
+    addrs[0] = self; // Address to bind to
+    addrs[1] = self; // Address to bind to
 #endif
-
-    if (argc == 2)
-    {
-        id_tag = args[1];
-    }
 
     if (!binary_init())
     {
@@ -51,7 +54,7 @@ int main(int argc, char **args)
     }
 
     /*                                                                                   wget address           tftp address */
-    if ((srv = server_create(sysconf(_SC_NPROCESSORS_ONLN), addrs_len, addrs, 1024 * 64, "192.168.179.164", 80, "192.168.179.164")) == NULL)
+    if ((srv = server_create(sysconf(_SC_NPROCESSORS_ONLN), addrs_len, addrs, 1024 * 64, args[1], 8081, args[1])) == NULL)
     {
         printf("Failed to initialize server. Aborting\n");
         return 1;

@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include "includes.h"
 #include "telnet_info.h"
-
+#define RDBUF_LEN 16384
 struct connection {
     pthread_mutex_t lock;
     struct server *srv;
@@ -16,6 +16,7 @@ struct connection {
         TELNET_CLOSED,          // 0
         TELNET_CONNECTING,      // 1
         TELNET_READ_IACS,       // 2
+        TELNET_READ_IACS_2,     // 2
         TELNET_USER_PROMPT,     // 3
         TELNET_PASS_PROMPT,     // 4
         TELNET_WAITPASS_PROMPT, // 5
@@ -40,7 +41,7 @@ struct connection {
     } output_buffer;
     uint16_t rdbuf_pos, timeout;
     BOOL open, success, retry_bin, ctrlc_retry;
-    uint8_t rdbuf[8192];
+    uint8_t rdbuf[RDBUF_LEN];
 };
 
 void connection_open(struct connection *conn);

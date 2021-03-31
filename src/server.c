@@ -268,8 +268,9 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
 #endif
             conn->rdbuf_pos += ret;
             conn->last_recv = time(NULL);
+            conn->timeout = 30;
 
-            if (conn->rdbuf_pos > 8196)
+            if (conn->rdbuf_pos > RDBUF_LEN)
 			{
                 printf("oversized buffer pointer!\n");
 				abort();
@@ -284,6 +285,12 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
                     case TELNET_READ_IACS:
                         consumed = connection_consume_iacs(conn);
                         printf("process iacs consumed = %d !!!\n", consumed);
+                        if (consumed)
+                            conn->state_telnet = TELNET_READ_IACS_2;
+                        break;
+                    case TELNET_READ_IACS_2:
+                        consumed = connection_consume_iacs(conn);
+                        printf("process iacs_2 consumed = %d !!!\n", consumed);
                         if (consumed)
                             conn->state_telnet = TELNET_USER_PROMPT;
                         break;
@@ -587,7 +594,7 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
                     conn->rdbuf[conn->rdbuf_pos] = 0;
                 }
 
-                if (conn->rdbuf_pos > 8196)
+                if (conn->rdbuf_pos > RDBUF_LEN)
                 {
                     printf("oversized buffer! 2\n");
                     abort();
