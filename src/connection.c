@@ -173,6 +173,8 @@ int connection_consume_login_prompt(struct connection *conn)
             prompt_ending = tmp;
     }
 
+    printf("********user*********buffer = %s(%d)\n", conn->rdbuf, conn->rdbuf_pos);
+    printf("********user*********prompt_ending = %d\n", prompt_ending);
     if (prompt_ending == -1)
         return 0;
     else
@@ -204,6 +206,8 @@ int connection_consume_password_prompt(struct connection *conn)
             prompt_ending = tmp;
     }
 
+    printf("********password*********buffer = %s(%d)\n", conn->rdbuf, conn->rdbuf_pos);
+    printf("********password*********prompt_ending = %d\n", prompt_ending);
     if (prompt_ending == -1)
         return 0;
     else

